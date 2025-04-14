@@ -9,6 +9,12 @@ Versioning].
 
 ## [Unreleased] <!-- #release:date -->
 
+## [0.11.0] - 2024-03-29
+
+* Add `portal_url` to `Customer`.
+* Add `require_successful_payment` field to the `CreditLedgerInvoiceSettingsRequestParams`.
+* Bump MSRV to 1.75.
+
 ## [0.10.0] - 2024-01-29
 
 * Add `invoice_number`, `currency`, `issued_at`, and `metadata` fields to the
@@ -79,7 +85,8 @@ Versioning].
 Initial release.
 
 <!-- #release:next-url -->
-[Unreleased]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.8.1...v0.9.0
 [0.8.1]: https://github.com/MaterializeInc/rust-orb-billing/compare/v0.8.0...v0.8.1
