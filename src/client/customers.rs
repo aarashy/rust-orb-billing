@@ -31,6 +31,7 @@ use crate::serde::Empty;
 use crate::util::StrIteratorExt;
 
 const CUSTOMERS_PATH: [&str; 1] = ["customers"];
+const ALERTS_PATH: [&str; 1] = ["alerts"];
 
 #[derive(Deserialize)]
 struct ArrayResponse<T> {
@@ -525,6 +526,13 @@ pub struct CustomerCostParamsFilter<'a> {
     pub group_by: Option<&'a str>,
 }
 
+/// The filters applied to the customer alerts query.
+#[derive(Debug, Default, Clone)]
+pub struct ListAlertsFilter<'a> {
+    /// Filter on the external_customer_id
+    pub external_customer_id: Option<&'a str>,
+}
+
 /// Configures automatic payments for the customer
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct CreateTopUpRequest<'a> {
@@ -545,6 +553,52 @@ pub struct CreateTopUpRequest<'a> {
 pub struct ListTopUpsResponse {
     /// The list of topups.
     pub data: Vec<TopUp>,
+}
+
+/// The different types of Orb alerts
+#[non_exhaustive]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize_enum_str, Serialize_enum_str)]
+pub enum OrbAlertType {
+    /// Usage exceeding a threshold
+    #[serde(rename = "usage_exceeded")]
+    UsageExceeded,
+    /// Cost exceeding a threshold
+    #[serde(rename = "cost_exceeded")]
+    CostExceeded,
+    /// Ran out of credit balance
+    #[serde(rename = "credit_balance_depleted")]
+    CreditBalanceDepleted,
+    /// Regained credit balance
+    #[serde(rename = "credit_balance_recovered")]
+    CreditBalanceRecovered,
+    /// Credit balance dropped below threshold
+    #[serde(rename = "credit_balance_dropped")]
+    CreditBalanceDropped,
+    /// Other.
+    #[serde(other)]
+    Other(String),
+}
+
+/// Orb Alerts are the trigger configuration for Orb webhooks.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct Alert {
+    /// The ID of the alert
+    pub id: String,
+    /// The type of the alert
+    #[serde(rename = "type")]
+    pub kind: OrbAlertType,
+    /// The time at which the alert was created.
+    #[serde(with = "time::serde::rfc3339")]
+    pub created_at: OffsetDateTime,
+    /// Whether or not the alert is enabled.
+    pub enabled: bool,
+}
+
+/// The response for a user's listing topups.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub struct ListAlertsResponse {
+    /// The list of topups.
+    pub data: Vec<Alert>,
 }
 
 /// Configures an external payment or invoicing solution for a customer.
@@ -569,6 +623,14 @@ trait Filterable<T> {
     fn apply(self, filter: &T) -> Self;
 }
 
+impl Filterable<ListAlertsFilter<'_>> for RequestBuilder {
+    fn apply(mut self, filter: &ListAlertsFilter<'_>) -> Self {
+        if let Some(external_customer_id) = &filter.external_customer_id {
+            self = self.query(&[("external_customer_id", external_customer_id.to_string())]);
+        }
+        self
+    }
+}
 impl Filterable<CustomerCostParamsFilter<'_>> for RequestBuilder {
     /// Apply the filter to a request.
     fn apply(mut self, filter: &CustomerCostParamsFilter) -> Self {
@@ -989,6 +1051,17 @@ impl Client {
                 .chain_one("top_ups"),
         );
         let res: ListTopUpsResponse = self.send_request(req).await?;
+        Ok(res)
+    }
+
+    /// List alerts. Optional filter on customer ID.
+    pub async fn list_alerts<'a>(
+        &self,
+        params: ListAlertsFilter<'a>,
+    ) -> Result<ListAlertsResponse, Error> {
+        let req = self.build_request(Method::GET, ALERTS_PATH);
+        let req = req.apply(&params);
+        let res: ListAlertsResponse = self.send_request(req).await?;
         Ok(res)
     }
 

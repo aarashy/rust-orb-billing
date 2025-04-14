@@ -44,15 +44,15 @@ mod util;
 
 pub use client::customers::{
     AddIncrementCreditLedgerEntryRequestParams, AddVoidCreditLedgerEntryRequestParams, Address,
-    AddressRequest, CostViewMode, CreateCustomerRequest, CreateTopUpRequest, CreditBlockStatus,
-    CreditLedgerInvoiceSettingsRequestParams, Customer, CustomerCostBucket, CustomerCostItem,
-    CustomerCostParams, CustomerCostParamsFilter, CustomerCostPriceBlock,
+    AddressRequest, Alert, CostViewMode, CreateCustomerRequest, CreateTopUpRequest,
+    CreditBlockStatus, CreditLedgerInvoiceSettingsRequestParams, Customer, CustomerCostBucket,
+    CustomerCostItem, CustomerCostParams, CustomerCostParamsFilter, CustomerCostPriceBlock,
     CustomerCostPriceBlockMatrixPrice, CustomerCostPriceBlockMatrixPriceConfig,
     CustomerCostPriceBlockMatrixPriceValue, CustomerCostPriceBlockPrice,
     CustomerCostPriceBlockPriceGroup, CustomerCostPriceBlockUnitPrice,
     CustomerCostPriceBlockUnitPriceConfig, CustomerCreditBlock, CustomerId,
-    CustomerPaymentProviderRequest, LedgerEntry, LedgerEntryRequest, ListTopUpsResponse,
-    PaymentProvider, TopUp, UpdateCustomerRequest, VoidReason,
+    CustomerPaymentProviderRequest, LedgerEntry, LedgerEntryRequest, ListAlertsFilter,
+    ListTopUpsResponse, OrbAlertType, PaymentProvider, TopUp, UpdateCustomerRequest, VoidReason,
 };
 pub use client::events::{
     AmendEventRequest, Event, EventPropertyValue, EventSearchParams, IngestEventDebugResponse,
